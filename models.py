@@ -8,6 +8,12 @@ def connect_db(app):
     db.init_app(app)
 
 class User(db.Model):
+    """
+    The class we'll use to model our user data.
+    Users must have a first name and ID.
+    Last name is optional.
+    Image has a default setting if the user doesn't provide one.
+    """
 
     __tablename__ = "users"
 
