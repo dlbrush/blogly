@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -15,18 +16,18 @@ class User(db.Model):
     Image has a default setting if the user doesn't provide one.
     """
 
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer,
                     primary_key=True,
                     autoincrement=True)
 
-    first_name = db.Column(db.String,
+    first_name = db.Column(db.Text,
                             nullable = False)
 
-    last_name = db.Column(db.String)
+    last_name = db.Column(db.Text)
 
-    image = db.Column(db.String,
+    image = db.Column(db.Text,
                         default= 'https://images.unsplash.com/photo-1601027847350-0285867c31f7?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=668&q=80')
 
     def edit(self, first, last, image):
@@ -41,7 +42,6 @@ class User(db.Model):
         if image:
             self.image = image
         
-        db.session.add(self)
         db.session.commit()
 
 
@@ -50,4 +50,44 @@ class User(db.Model):
         """Creates a new User instance and commits it to the database"""
         new_user = cls(first_name=first, last_name=last, image=image)
         db.session.add(new_user)
+        db.session.commit()
+
+class Post(db.Model):
+
+    __tablename__ = 'posts'
+
+    id = db.Column(
+        db.Integer, 
+        primary_key = True,
+        autoincrement = True
+    )
+
+    title = db.Column(
+        db.Text,
+        nullable = False
+    )
+
+    content = db.Column(
+        db.Text,
+        nullable = False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable = False,
+        default = datetime.today()
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        nullable = False,
+        db.ForeignKey('users.id')
+    )
+
+    user = db.relationship('User', backref='posts')
+
+    @classmethod
+    def commit_new_post(cls, user_id, title, content):
+        new_post = Post(user_id=user_id, title=title, content=content)
+        db.session.add(new_post)
         db.session.commit()
