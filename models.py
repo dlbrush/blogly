@@ -80,8 +80,8 @@ class Post(db.Model):
 
     user_id = db.Column(
         db.Integer,
-        nullable = False,
-        db.ForeignKey('users.id')
+        db.ForeignKey('users.id'),
+        nullable = False
     )
 
     user = db.relationship('User', backref='posts')
@@ -90,4 +90,9 @@ class Post(db.Model):
     def commit_new_post(cls, user_id, title, content):
         new_post = Post(user_id=user_id, title=title, content=content)
         db.session.add(new_post)
+        db.session.commit()
+
+    def edit(self, title, content):
+        self.title = title
+        self.content = content
         db.session.commit()

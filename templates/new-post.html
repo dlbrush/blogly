@@ -7,16 +7,16 @@ New Post
 {% block content %}
 <h1>Add Post for {{user.first_name}}{% if user.last_name %} {{user.last_name}}{% endif %}</h1>
 
-<form action="users/{{user.id}}/posts/new" method="POST">
+<form action="/users/{{user.id}}/posts/new" method="POST">
     <div class="form-group row">
         <label for="title" class="col-2">Title</label>
         <input class="form-control col-10" name="title" type="text" placeholder="Title" required>
     </div>
     <div class="form-group row">
         <label for="content" class="col-2">Content</label>
-        <input class="form-control col-10" name="content" type="textarea" placeholder="Add some content!" required>
+        <textarea class="form-control col-10" name="content" type="textarea" placeholder="Add some content!" required></textarea>
     </div>
-    <a class="btn btn-primary" href="users/{{user.id}}">Cancel</a>
+    <a class="btn btn-primary" href="../../{{user.id}}">Cancel</a>
     <button class="btn btn-success">Add</button>
 </form>
 {% endblock %}

@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User
+from models import db, connect_db, User, Post
 
 app = Flask(__name__)
 
@@ -9,7 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-# debug = DebugToolbarExtension(app)
+debug = DebugToolbarExtension(app)
 
 connect_db(app)
 
@@ -71,8 +71,13 @@ def edit_user(user_id):
 def delete_user(user_id):
     """
     Delete a user from the database from the ID passed.
+    If they have any posts, delete those first to not violate fK restraints.
     Redirect to the user list.
     """
+    user = User.query.get(user_id)
+    for post in user.posts:
+        Post.query.filter_by(id=post.id).delete()
+
     User.query.filter_by(id=user_id).delete()
     db.session.commit()
 
@@ -89,4 +94,36 @@ def add_post(user_id):
     content = request.form['content']
 
     Post.commit_new_post(user_id=user_id, title=title, content=content)
+    return redirect(f'/users/{user_id}')
+
+@app.route('/posts/<int:post_id>')
+def show_post(post_id):
+    post = Post.query.get(post_id)
+    user = post.user
+
+    return render_template('post.html', post=post, user=user)
+
+@app.route('/posts/<int:post_id>/edit')
+def edit_post_form(post_id):
+    post = Post.query.get(post_id)
+
+    return render_template('post-edit.html', post=post)
+
+@app.route('/posts/<int:post_id>/edit', methods=['POST'])
+def edit_post(post_id):
+    post = Post.query.get(post_id)
+    title = request.form['title']
+    content = request.form['content']
+
+    post.edit(title=title, content=content)
+    return redirect(f'/posts/{post_id}')
+
+@app.route('/posts/<int:post_id>/delete', methods=['POST'])
+def delete_post(post_id):
+    post = Post.query.get(post_id)
+    user_id = post.user.id 
+
+    Post.query.filter_by(id=post_id).delete()
+    db.session.commit()
+    
     return redirect(f'/users/{user_id}')
