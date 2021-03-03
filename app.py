@@ -98,14 +98,14 @@ def add_post(user_id):
 
 @app.route('/posts/<int:post_id>')
 def show_post(post_id):
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
     user = post.user
 
     return render_template('post.html', post=post, user=user)
 
 @app.route('/posts/<int:post_id>/edit')
 def edit_post_form(post_id):
-    post = Post.query.get(post_id)
+    post = Post.query.get_or_404(post_id)
 
     return render_template('post-edit.html', post=post)
 
