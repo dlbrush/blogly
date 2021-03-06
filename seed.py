@@ -1,4 +1,4 @@
-from models import User, Post, db
+from models import User, Post, db, Tag, PostTag
 from app import app
 
 # Drop tables if they already exist, and then create them again
@@ -7,7 +7,10 @@ db.create_all()
 
 # Delete all entries if there are any
 User.query.delete()
+PostTag.query.delete()
 Post.query.delete()
+Tag.query.delete()
+
 
 # Seed some users
 matty = User(first_name='Matthew', last_name='Yglesias', image='https://static01.nyt.com/images/2020/07/30/books/review/Salmon1/Salmon1-superJumbo.jpg?quality=90&auto=webp')
@@ -25,4 +28,16 @@ post3 = Post(title="I'm back.", content="It's me, Matt, and I'm back again. Lege
 
 #Commit posts
 db.session.add_all([post1, post2, post3])
+db.session.commit()
+
+#Seed some tags and append posts
+politics = Tag(name="politics")
+politics.posts.append(post1)
+politics.posts.append(post3)
+
+music = Tag(name="music")
+music.posts.append(post2)
+
+#Commit tags
+db.session.add_all([politics, music])
 db.session.commit()
