@@ -87,14 +87,34 @@ class Post(db.Model):
     user = db.relationship('User', backref='posts')
 
     @classmethod
-    def commit_new_post(cls, user_id, title, content):
+    def commit_new_post(cls, user_id, title, content, tags):
         new_post = Post(user_id=user_id, title=title, content=content)
         db.session.add(new_post)
         db.session.commit()
 
-    def edit(self, title, content):
+        #Add tags afterwards so that we can use the id returned from SQLA
+        if tags:
+            for tag in tags:
+                tag_int = int(tag)
+                post_tag = PostTag(post_id = new_post.id, tag_id = tag_int)
+                db.session.add(post_tag)
+            db.session.commit()
+
+    def edit(self, title, content, tags):
         self.title = title
         self.content = content
+
+        # loop through all tags to see if we need to add or remove relationships
+        all_tags = Tag.query.all()
+        for tag in all_tags:
+            #Check if a tag was checked in the form that was sent, and if it isn't already in this posts tag add it
+            if str(tag.id) in tags:
+                if tag not in self.tags:
+                    self.tags.append(tag)
+            #If the tag is not checked, delete any relationships between the tag and the post
+            else:
+                PostTag.query.filter_by(post_id = self.id, tag_id = tag.id).delete()
+
         db.session.commit()
 
 class Tag(db.Model):
@@ -123,6 +143,18 @@ class Tag(db.Model):
         secondary = 'posts_tags',
         backref = 'tags'
     )
+
+    @classmethod
+    def commit_new_tag(cls, name):
+        new_tag = Tag(name=name.lower())
+        db.session.add(new_tag)
+        db.session.commit()
+
+    def edit(self, name):
+        name_lower = name.lower()
+        self.name = name_lower
+        db.session.commit()
+
 
 class PostTag(db.Model):
 

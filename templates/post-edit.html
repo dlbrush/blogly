@@ -16,7 +16,13 @@ Edit Post
         <label for="content" class="col-2">Content</label>
         <textarea class="form-control col-10" name="content" type="textarea"  required>{{post.content}}</textarea>
     </div>
-    <a class="btn btn-primary" href="/posts/{{post.id}}">Cancel</a>
-    <button class="btn btn-success">Edit</button>
+    {% for tag in all_tags %}
+    <div class="form-check">
+        <input class="form-check-input" name="tag" type="checkbox" value="{{tag.id}}" {% if tag in post_tags %}checked{% endif %}>
+        <label for="tag" class="form-check-label">{{tag.name.capitalize()}}</label>
+    </div>
+    {% endfor %}
+    <button class="btn btn-success float-right">Edit</button>
+    <a class="btn btn-primary float-right mx-1" href="/posts/{{post.id}}">Cancel</a>
 </form>
 {% endblock %}

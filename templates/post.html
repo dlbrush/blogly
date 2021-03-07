@@ -7,10 +7,21 @@
 {% block content %}
 <h1>{{post.title}}</h1>
 <p>{{post.content}}</p>
-<p><em>By {{user.first_name}}{% if user.last_name %} {{user.last_name}}{% endif %}</em></p>
+<p><em>By {{user.first_name}}{% if user.last_name %} {{user.last_name}}{% endif %} on {{timestamp}}</em></p>
+
+{% if tags %}
+<div class="my-2">
+<strong>Tags:</strong>
+{% for tag in tags %}
+<a href="/tags/{{tag.id}}"><span class="badge badge-primary">{{tag.name}}</span></a>
+{% endfor %}
+</div>
+{% endif %}
+
 <form action="/posts/{{post.id}}/delete" method="POST">
     <a class="btn btn-light" href="/users/{{user.id}}">Cancel</a>
     <a class="btn btn-primary" href="/posts/{{post.id}}/edit">Edit</a>
     <button class="btn btn-danger">Delete</button>
 </form>
+
 {% endblock %}

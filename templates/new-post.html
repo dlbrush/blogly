@@ -16,7 +16,13 @@ New Post
         <label for="content" class="col-2">Content</label>
         <textarea class="form-control col-10" name="content" type="textarea" placeholder="Add some content!" required></textarea>
     </div>
-    <a class="btn btn-primary" href="../../{{user.id}}">Cancel</a>
-    <button class="btn btn-success">Add</button>
+    {% for tag in all_tags %}
+    <div class="form-check">
+        <input class="form-check-input" name="tag" type="checkbox" value="{{tag.id}}">
+        <label for="tag" class="form-check-label">{{tag.name.capitalize()}}</label>
+    </div>
+    {% endfor %}
+    <button class="btn btn-success float-right">Add</button>
+    <a class="btn btn-primary float-right mx-1" href="../../{{user.id}}">Cancel</a>
 </form>
 {% endblock %}
