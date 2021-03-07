@@ -53,6 +53,12 @@ class User(db.Model):
         db.session.commit()
 
 class Post(db.Model):
+    """
+    Class used to model a post.
+    Must have a title and content.
+    created_at will default to the time the record is created.
+    user_id is a FK linking to the User model.
+    """
 
     __tablename__ = 'posts'
 
@@ -88,6 +94,10 @@ class Post(db.Model):
 
     @classmethod
     def commit_new_post(cls, user_id, title, content, tags):
+        """
+        Create a new Post from the data passed and commit it to the DB.
+        If any tags were passed, create a relationship between the new post and each tag.
+        """
         new_post = Post(user_id=user_id, title=title, content=content)
         db.session.add(new_post)
         db.session.commit()
@@ -101,6 +111,10 @@ class Post(db.Model):
             db.session.commit()
 
     def edit(self, title, content, tags):
+        """
+        Edit the records for a post with the data passed to this method.
+        We'll need to create or remove relationships for all of the tags that were checked or not checked, also.
+        """
         self.title = title
         self.content = content
 
@@ -118,6 +132,11 @@ class Post(db.Model):
         db.session.commit()
 
 class Tag(db.Model):
+    """
+    Model for a Tag for our posts.
+    Name must be unique, and will be stored as all lowercase.
+    Linked to the Post and PostTag models through relationships.
+    """
 
     __tablename__ = 'tags'
 
@@ -146,17 +165,29 @@ class Tag(db.Model):
 
     @classmethod
     def commit_new_tag(cls, name):
+        """
+        Commit a new tag to the database from the name passed.
+        Name should be stored as all lowercase.
+        """
         new_tag = Tag(name=name.lower())
         db.session.add(new_tag)
         db.session.commit()
 
     def edit(self, name):
-        name_lower = name.lower()
-        self.name = name_lower
+        """
+        Edit this instance of a Tag.
+        Make sure the new name is saved as lowercase.
+        """
+        self.name = name.lower()
         db.session.commit()
 
 
 class PostTag(db.Model):
+    """
+    Model for a join table between Posts and Tags.
+    Uses a composite primary key between the post_id and tag_id.
+    Both fields are necessary to create a new instance.
+    """
 
     __tablename__ = "posts_tags"
 
